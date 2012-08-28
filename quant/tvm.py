@@ -6,7 +6,8 @@ from quant.optimization import newton
 
 class TVM:
 	def __str__(self):
-		return "n=%f, r=%f, pv=%f, pmt=%f, fv=%f" % (self.n, self.r, self.pv, self.pmt, self.fv)
+		return "n=%f, r=%f, pv=%f, pmt=%f, fv=%f" % (
+			self.n, self.r, self.pv, self.pmt, self.fv)
 	def __init__(self, n=0.0, r=0.0, pv=0.0, pmt=0.0, fv=0.0):
 		self.n = float(n)
 		self.r = float(r)
