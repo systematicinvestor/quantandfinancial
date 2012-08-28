@@ -2,7 +2,7 @@
 # quantandfinancial.blogspot.com
 
 from math import pow, floor, ceil, log
-from optimization import newton
+from quant.optimization import newton
 
 class TVM:
 	def __str__(self):
@@ -33,18 +33,5 @@ class TVM:
 			z = pow(1+r, -self.n)
 			pva = self.pmt / r
 			return -(self.pv + (1-z) * pva)/z
-		return newton(function_fv, self, 5, self.fv, 1000, 0.0001) 
-
-def unit_test():
-	tvm = TVM(5.2, .03, 1000, 10, -1221.530297)
-	print(tvm)
-	print("N   = %f " % tvm.calc_n())
-	print("R   = %f " % tvm.calc_r())
-	print("PV  = %f " % tvm.calc_pv())
-	print("PMT = %f " % tvm.calc_pmt())
-	print("FV  = %f " % tvm.calc_fv())
-	print("ANOTHER " , TVM(n=5.2, r=.03, pv=1000, fv=-1221.530297).calc_pmt())
-	
-#unit_test()		
-		
+		return newton(function_fv, self, 5, self.fv, 1000, 0.0001) 		
 			
