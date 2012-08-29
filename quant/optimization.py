@@ -22,10 +22,3 @@ def newton(f, fArg, x0, y, maxIter, minError):
 		if (abs(f(x0, fArg)-y) < minError): break
 		counter += 1
 	return x0
-	
-def unit_test():
-	def f(x, fArg):
-		return pow(2, x)
-	print(newton(f, None, 1, 16, 1000, 0))
-	
-#unit_test()

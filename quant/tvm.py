@@ -34,5 +34,6 @@ class TVM:
 			z = pow(1+r, -self.n)
 			pva = self.pmt / r
 			return -(self.pv + (1-z) * pva)/z
-		return newton(function_fv, self, 5, self.fv, 1000, 0.0001) 		
+		return newton(f=function_fv, fArg=self, x0=.05, 
+			y=self.fv, maxIter=1000, minError=0.0001) 		
 			

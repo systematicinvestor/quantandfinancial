@@ -28,10 +28,3 @@ def read_from_file(filename):
 		bonds.append(b)
 	return bonds
 	
-bonds = read_from_file('gilts_2012_06_13.csv')
-
-for b in bonds:
-	print(b)
-	
-for x in [1/12, 3/12, 6/12, 9/12, 1, 2, 3, 5, 10, 15, 20, 30, 50]:
-	print(x, quant.interpolate(yield_curve(bonds), x))
