@@ -1,13 +1,12 @@
 # Copyright (c) 2012 Quantitative & Financial, All rights reserved
 # quantandfinancial.blogspot.com
 
-from bond import Bond, yield_curve
-import bond
+from structures.bond import Bond
 import io
 import time
 import quant
 	
-def read_from_file(filename):
+def readfromfile(filename):
 	f = io.open(filename, 'r')
 	data = f.read()
 	bonds = []

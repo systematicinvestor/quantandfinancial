@@ -3,7 +3,7 @@
 
 import io
 import time
-from tvm import TVM
+from quant.tvm import TVM
 
 class Bond:
 	epic = None
@@ -14,7 +14,7 @@ class Bond:
 	bid = None
 	ask = None
 	def __str__(self):
-		return self.epic + "  " + float(self.ttm()) + " " + float(self.calc_ytm())
+		return "epic=%s ttm=%f ytm=%f" % (self.epic, self.ttm(), self.calc_ytm())
 	def ttm(self): # in years
 		sec1 = time.mktime(time.localtime())
 		sec2 = time.mktime(self.maturity)
