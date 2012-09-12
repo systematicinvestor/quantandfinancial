@@ -3,7 +3,7 @@
 
 from structures.bond import Bond
 import io
-import time
+from datetime import datetime
 import quant
 	
 def readfromfile(filename):
@@ -21,7 +21,7 @@ def readfromfile(filename):
 		b.epic = entries[0]
 		b.desc = entries[1]
 		b.couponRate = float(entries[2]) / 100.0
-		b.maturity = time.strptime(entries[3], '%d-%b-%y')
+		b.maturity = datetime.strptime(entries[3], '%d-%b-%y')
 		b.bid = float(entries[4]) / 100
 		b.ask = float(entries[5]) / 100
 		bonds.append(b)

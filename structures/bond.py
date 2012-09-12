@@ -15,10 +15,9 @@ class Bond:
 	ask = None
 	def __str__(self):
 		return "epic=%s ttm=%f ytm=%f" % (self.epic, self.ttm(), self.calc_ytm())
-	def ttm(self): # in years
-		sec1 = time.mktime(time.localtime())
-		sec2 = time.mktime(self.maturity)
-		return (sec2-sec1) / (60*60*24*365.25)
+	def ttm(self, localtime, daysInYear = 360): # in years
+		delta = self.maturity - localtime
+		return delta.days / daysInYear
 	def mid(self):
 		return (self.bid + self.ask) / 2
 	def calc_ytm(self):

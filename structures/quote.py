@@ -1,7 +1,7 @@
 # Copyright (c) 2012 Quantitative & Financial, All rights reserved
 # quantandfinancial.blogspot.com
 
-import time
+from datetime import datetime
 import io
 
 class QuoteSeries:
@@ -9,8 +9,8 @@ class QuoteSeries:
 		self.name = name
 		self.data = data if data != None else []
 	def __str__(self):
-		dateFromStr = time.strftime('%Y-%m-%d', self.data[0].date)
-		dateToStr =   time.strftime('%Y-%m-%d', self.data[-1].date)
+		dateFromStr = datetime.strftime('%Y-%m-%d', self.data[0].date)
+		dateToStr =   datetime.strftime('%Y-%m-%d', self.data[-1].date)
 		return self.name + " : " + str(len(self.data)) + " quotes [" + dateFromStr + " - " + dateToStr + "], last "+str(self.data[-1].c)
 	def getprices(self):
 		array = []
@@ -52,4 +52,4 @@ class Quote:
 		self.c = c
 		self.v = v
 	def __str__(self):
-		return "%s c=%f" % (time.strftime('%Y-%m-%d', self.date), self.c)
+		return "%s c=%f" % (datetime.strftime('%Y-%m-%d', self.date), self.c)
