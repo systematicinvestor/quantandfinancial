@@ -25,5 +25,6 @@ def readfromfile(filename):
 		b.bid = float(entries[4]) / 100
 		b.ask = float(entries[5]) / 100
 		bonds.append(b)
+	f.close()
 	return bonds
 	
