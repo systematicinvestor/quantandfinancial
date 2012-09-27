@@ -2,7 +2,6 @@
 # quantandfinancial.blogspot.com
 
 from datasources.bondscape import readfromfile
-from structures.bond import getyieldcurve
 from quant.tvm import TVM
 from datetime import datetime
 import scipy.interpolate

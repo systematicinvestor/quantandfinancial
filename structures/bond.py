@@ -26,11 +26,14 @@ class Bond:
 			return tvm.calc_r() * self.freq
 		except Exception:
 			return None
-
-def getyieldcurve(bonds):
-	out = []
-	for b in bonds:
-		t = b.ttm(), b.calc_ytm()
-		out.append(t)		
-	return out
-	
+	def calc_duration(self):
+		price = (self.bid+self.ask)/2
+		tvm = TVM(n=ttm*self.freq, pv=-price, pmt=self.couponRate/self.freq, fv=1)
+		ytm = tvm.calc_r() * self.freq
+		ytmDelta = .001
+		tvm.r = (ytm-ytmDelta)/b.freq
+		priceHigh = -tvm.calc_pv()
+		tvm.r = (ytm+ytmDelta)/b.freq
+		priceLow =  -tvm.calc_pv()
+		duration = ((priceHigh-priceLow)*2 / (priceHigh+priceLow)) / (ytmDelta*2)
+		return duration
