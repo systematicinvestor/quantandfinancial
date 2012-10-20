@@ -44,7 +44,7 @@ for i in range(0, len(t)):
 	print("%.2f\t%.2f%%" % (t[i], 100*y[i]))
 
 # bootstrapping
-s = []
+s = [] # output array for spot rates
 for i in range(0, len(t)): #calculate i-th spot rate 
 	sum = 0
 	for j in range(0, i): #by iterating through 0..i
@@ -57,36 +57,27 @@ for i in range(0, len(t)):
 	print("%.2f\t%.2f%%" % (t[i], 100*s[i]))
 
 # reverse check
-print('Reverse check')
-for i in range(0, len(t)):
-	sum = 0
-	ytm = y[i]
-	for j in range(0, i):
-		sum += ytm / (1+s[j])**t[j]
-	sum += (1+ytm) / (1+s[i])**t[i]
-	if (sum < 1-1e-5 or sum > 1+1e+5): raise Exception('Reverse-check for bootstrapping failed, sum=%f' % sum)
- 
-# Calculated YTMs doesn't necessarily correspond to those quoted in data file (source: Bondscape.net), due to accrued interest
-# and a fact that coupon payment are bound to some specific calendar date, not necessarily, one semiannually
-for b in bonds:
-	ttm = (b.maturity - localtime).days / 360
-	price = (b.bid+b.ask)/2
-	tvm = TVM(n=ttm*b.freq, pv=-price, pmt=b.couponRate/b.freq, fv=1)
-	ytm = tvm.calc_r() * b.freq
-	ytmDelta = .001
-	tvm.r = (ytm-ytmDelta)/b.freq
-	priceHigh = -tvm.calc_pv()
-	tvm.r = (ytm+ytmDelta)/b.freq
-	priceLow =  -tvm.calc_pv()
-	duration = ((priceHigh-priceLow)*2 / (priceHigh+priceLow)) / (ytmDelta*2)
-	print("maturity=%.3f duration=%.3f" % (ttm, duration)) 
+#for i in range(0, len(t)):
+#	sum = 0
+#	ytm = y[i]
+#	for j in range(0, i):
+#		sum += ytm / (1+s[j])**t[j]
+#	sum += (1+ytm) / (1+s[i])**t[i]
+#	if (sum < 1-1e-5 or sum > 1+1e+5): raise Exception('Reverse-check for bootstrapping failed, sum=%f' % sum)
  
 from pylab import *
-subplot(311)
-plot(tr, yr, marker='^'), xlabel('Time to maturity'), ylabel('Yield to maturity'), grid(True)
-subplot(312)
-plot(t, y, marker='^'), xlabel('Time to maturity'), ylabel('Yield to maturity'), grid(True)
-subplot(313)
-plot(t, s, marker='^'), xlabel('Time'), ylabel('Spot Rate'), grid(True)
 
+#subplot(311)
+#plot(tr, array(yr)*100, marker='^'), title('Original Yield Curve'), xlabel('Time to maturity'), ylabel('Yield to maturity'), grid(True)
+#subplot(312)
+#plot(t, array(y)*100, marker='^'), title('Interpolated Yield Curve'), xlabel('Time to maturity'), ylabel('Yield to maturity'), grid(True)
+#subplot(313)
+#plot(t, array(s)*100, marker='^'), title('Spot Rate Curve'), xlabel('Time'), ylabel('Spot Rate'), grid(True)
+#show()   
+
+p1 = plot(tr, array(yr)*100, marker='^'), xlabel('Time to maturity'), grid(True)
+p2 = plot(t, array(y)*100, marker='^'), xlabel('Time to maturity'), grid(True)
+p3 = plot(t, array(s)*100, marker='o') , xlabel('Time to maturity'), grid(True)
+legend([p1[0][0],p2[0][0],p3[0][0]], ['Original Yield Curve', 'Interpolated Yield Curve', 'Spot Rate Curve'], 4)
 show()   
+
