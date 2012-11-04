@@ -2,20 +2,18 @@
 # quantandfinancial.blogspot.com
 
 from structures.quote import Quote, QuoteSeries
-import time
+from datetime import datetime
 import urllib.request
 
-def getquotes(symbol):
-	url = "http://www.google.com/finance/historical?q=" + symbol + "&output=csv"
-	page = str(urllib.request.urlopen(url).read())
+def getquotesfromstring(symbol, string):
 	linecount = 0
 	data = []
-	for line in page.split("\\n"):
+	for line in string.split("\\n"):
 		linecount += 1
 		entries = line.split(",")
 		if len(entries) != 6 or linecount==1: continue
 		quote = Quote(
-			time.strptime(entries[0], '%d-%b-%y'),
+			datetime.strptime(entries[0], '%d-%b-%y'),
 			float(entries[1]),
 			float(entries[2]),
 			float(entries[3]),
@@ -24,3 +22,8 @@ def getquotes(symbol):
 		data.append(quote)
 	reversedIterator = reversed(data)
 	return QuoteSeries(symbol, list(reversedIterator))
+
+def getquotesfromweb(symbol):
+	url = "http://www.google.com/finance/historical?q=" + symbol + "&output=csv"
+	page = str(urllib.request.urlopen(url).read())
+	return getquotesfromstring(symbol, page)

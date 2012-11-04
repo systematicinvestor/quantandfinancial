@@ -9,8 +9,9 @@ class QuoteSeries:
 		self.name = name
 		self.data = data if data != None else []
 	def __str__(self):
-		dateFromStr = datetime.strftime('%Y-%m-%d', self.data[0].date)
-		dateToStr =   datetime.strftime('%Y-%m-%d', self.data[-1].date)
+		assert(type(self.data[0].date)==datetime)
+		dateFromStr = self.data[0].date.strftime('%Y-%m-%d')
+		dateToStr =   self.data[-1].date.strftime('%Y-%m-%d')
 		return self.name + " : " + str(len(self.data)) + " quotes [" + dateFromStr + " - " + dateToStr + "], last "+str(self.data[-1].c)
 	def getprices(self):
 		array = []
@@ -36,6 +37,27 @@ class QuoteSeries:
 			for i in range(0, len(qs1out.data)):
 				assert(qs1out.data[i].date==qs2out.data[i].date)
 		return qs1out, qs2out
+	@staticmethod
+	def loadfromfile(name, filename):
+		linecount = 0
+		f = io.open(filename, 'r')
+		qs = QuoteSeries()
+		qs.name = name
+		for line in f.read().splitlines():
+			linecount += 1
+			entries = line.split(",")
+			if len(entries) != 6 or linecount==1: continue
+			date = datetime.strptime(entries[0], '%y-%m-%d') if len(entries[0])==10 else datetime.strptime(entries[0], '%Y-%m-%d %H:%M:%S')
+			quote = Quote(
+				date,
+				float(entries[1]),
+				float(entries[2]),
+				float(entries[3]),
+				float(entries[4]),	
+				int(entries[5]))
+			qs.data.append(quote)
+		f.close()
+		return qs
 	def savetofile(self,filename):
 		f = io.open(filename, "w")
 		f.write('date, open, high, low, close, volume\n')
@@ -52,4 +74,4 @@ class Quote:
 		self.c = c
 		self.v = v
 	def __str__(self):
-		return "%s c=%f" % (datetime.strftime('%Y-%m-%d', self.date), self.c)
+		return "%s c=%f" % (str(self.date), self.c)
