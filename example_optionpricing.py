@@ -12,7 +12,7 @@ call, put, european, american = 100, 101, 102, 103
 
 #google.getquotesfromweb('IVV').savetofile('data/ivv.csv')
 
-prices = QuoteSeries.loadfromfile('IVV', 'data/ivv_2012_11_06.csv').getprices()
+prices = QuoteSeries.loadfromfile('IVV', 'data/ivv_2012_11_05.csv').getprices()
 prices = prices[:-30]	# We will use last 30 prices to calculate volatility
 
 # Calculation of daily continuous (logaritmic) returns
@@ -28,10 +28,10 @@ volat = volat_d * 250**.5		# Annualized volatility
 # Calculation inputs
 side = call				# Option side
 type = european 		# Option type
-price = prices[-1]		# Current instrument price (147.31, as of 2012/11/06)
+price = prices[-1]		# Current instrument price (147.31, as of 2012/11/05)
 strike = 140			# Strike price
-riskfree = .0010		# Risk-free rate, Yield on 3m US Treasury Yields, as of 2012/11/06
-divyield = .0199		# Dividend yield on S&P 500 (IVV), as of 2012/11/02
+riskfree = .0010		# Risk-free rate, Yield on 3m US Treasury Yields, as of 2012/11/05
+divyield = .0199		# Dividend yield on S&P 500 (IVV), as of 2012/11/05
 tte = (datetime(2012,12,22) - datetime(2012,11, 6)).days  	# Time to expiration in days
 
 # Pre-processing of inputs and calculation of per-step figures
