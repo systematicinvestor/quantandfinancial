@@ -13,7 +13,7 @@ call, put, european, american = 100, 101, 102, 103
 #google.getquotesfromweb('IVV').savetofile('data/ivv.csv')
 
 prices = QuoteSeries.loadfromfile('IVV', 'data/ivv_2012_11_05.csv').getprices()
-prices = prices[-250:]	# We will use last 32 prices to calculate volatility (32 trading days ~ 46 calendar days)
+prices = prices[-250:]	# We will use last 250 trading days
 
 # Calculation of daily continuous (logaritmic) returns
 returns = []
@@ -34,6 +34,15 @@ riskfree = .0007		# Risk-free rate, Yield on 3m US Treasury Yields, as of 2012/1
 divyield = .0199		# Dividend yield on S&P 500 (IVV), as of 2012/11/05
 tte = (datetime(2012,12,22) - datetime(2012,11, 6)).days  	# Time to expiration in days
 
+print('Calculation Inputs')
+print('%18s : %0.3f' % ('Price', price))
+print('%18s : %0.3f' % ('Strike', strike))
+print('%18s : %0.3f' % ('Risk-free', riskfree))
+print('%18s : %0.3f' % ('Div Yield', divyield))
+print('%18s : %0.3f' % ('TTE Days', tte))
+print('%18s : %0.3f' % ('Volatility', volat))
+print()
+
 # Pre-processing of inputs and calculation of per-step figures
 n = 8							# Depth of binomial tree (levels are numbered from 0 to n)
 tdelta = tte / (n * 365)		# Time delta per one step (as fraction of year)
@@ -44,9 +53,16 @@ dy = exp(divyield * tdelta) - 1 # Dividend yield per step
 pu = (1+rf-dy-d) / (u-d)		# Probability of up movement
 pd = 1 - pu						# Probability of down movement
 
+print('%18s : %0.8f' % ('Node prob U', pu))
+print('%18s : %0.8f' % ('Node prob D', pd))
+print('%18s : %0.8f' % ('Node tdelta', tdelta))
+print('%18s : %0.8f' % ('Node discount f', rf))
+print()
+
 assert(side==call or side==put)
 assert(style==american or style==european)
 
+print('Binomial Tree')
 # Generate terminal nodes of binomial tree
 level = []
 print('Tree level %i' % n)
@@ -58,7 +74,7 @@ for i in range(0, n+1): # Iterate through nodes from highest to lowest price
 	level.append((pr, ov))
 	print('Node Price %.3f, Option Value %.3f' %(pr, ov))
 	
-levels = [0,0,0]
+levels = [None,None,None] # Remember levels 0,1,2 for the greeks
 
 # reduce binomial tree
 for i in range(n-1, -1, -1): # [n-1 to 0]
@@ -83,8 +99,9 @@ delta1 = (levels[2][0][1]-levels[2][1][1]) / (levels[2][0][0]-levels[2][1][0])
 delta2 = (levels[2][1][1]-levels[2][2][1]) / (levels[2][1][0]-levels[2][2][0])
 gamma = (delta1-delta2) / (levels[2][0][0] - levels[2][2][0])
 theta = (levels[2][1][1]-optionvalue) / (2*tdelta)
-	
-print()
+
+print()	
+print('Results')
 print('Option Value %.03f' % optionvalue)
 print('Delta %.03f' % delta)
 print('Gamma %.03f' % gamma)
