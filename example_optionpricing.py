@@ -30,7 +30,7 @@ side = call				# Option side
 type = european 		# Option type
 price = prices[-1]		# Current instrument price (147.31, as of 2012/11/05)
 strike = 140			# Strike price
-riskfree = .0010		# Risk-free rate, Yield on 3m US Treasury Yields, as of 2012/11/05
+riskfree = .0007		# Risk-free rate, Yield on 3m US Treasury Yields, as of 2012/11/05
 divyield = .0199		# Dividend yield on S&P 500 (IVV), as of 2012/11/05
 tte = (datetime(2012,12,22) - datetime(2012,11, 6)).days  	# Time to expiration in days
 
