@@ -1,5 +1,5 @@
 # Copyright (c) 2012 Quantitative & Financial, All rights reserved
-# quantandfinancial.blogspot.com
+# www.quantandfinancial.com
 
 import datasources.google as google
 from structures.quote import QuoteSeries
@@ -8,7 +8,7 @@ from math import log, exp
 from datetime import datetime
 
 # Definition of enumerators
-CALL, PUT, EUROPEAN, AMERICAN = 100, 101, 102, 103
+call, put, european, american = 100, 101, 102, 103
 
 #google.getquotesfromweb('IVV').savetofile('data/ivv.csv')
 
@@ -26,8 +26,8 @@ volat_d = numpy.std(returns)	# Daily volatility
 volat = volat_d * 250**.5		# Annualized volatility
 
 # Calculation inputs
-side = CALL				# Option side
-type = EUROPEAN 		# Option type
+side = call				# Option side
+type = european 		# Option type
 price = prices[-1]		# Current instrument price (147.31, as of 2012/11/06)
 strike = 140			# Strike price
 riskfree = .0010		# Risk-free rate, Yield on 3m US Treasury Yields, as of 2012/11/06
@@ -44,8 +44,8 @@ dy = exp(divyield * tdelta) - 1 # Dividend yield per step
 pu = (1+rf-dy-d) / (u-d)		# Probability of up movement
 pd = 1 - pu						# Probability of down movement
 
-assert(side==CALL or side==PUT)
-assert(type==AMERICAN or type==EUROPEAN)
+assert(side==call or side==put)
+assert(type==american or type==european)
 
 # Generate terminal nodes of binomial tree
 level = []
@@ -54,7 +54,7 @@ for i in range(0, n+1): # Iterate through nodes from highest to lowest price
 	# Instrument's price at the node
 	pr = price * d**i * u**(n-i) 	
 	# Option value at the node (depending on side)
-	ov = max(0.0, pr-strike) if side==CALL else max(0.0, strike-pr)
+	ov = max(0.0, pr-strike) if side==call else max(0.0, strike-pr)
 	level.append((pr, ov))
 	print('Node Price %.3f, Option Value %.3f' %(pr, ov))
 	
@@ -70,7 +70,7 @@ for i in range(n-1, -1, -1): # [n-1 to 0]
 		pr = node_d[0] / d
 		# Option value at the node (depending on side)
 		ov = (node_d[1] * pd + node_u[1] * pu) / (1 + rf)	
-		if type==AMERICAN: # American options can be exercised anytime
+		if type==american: # American options can be exercised anytime
 			ov = max(ov, pr-strike if side==CALL else strike-pr)
 		levelNext.append((pr, ov))
 		print('Node Price %.3f, Option Value %.3f' %(pr, ov))

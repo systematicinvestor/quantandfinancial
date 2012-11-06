@@ -1,5 +1,5 @@
 # Copyright (c) 2012 Quantitative & Financial, All rights reserved
-# quantandfinancial.blogspot.com
+# www.quantandfinancial.com
 
 from quant.tvm import TVM
 

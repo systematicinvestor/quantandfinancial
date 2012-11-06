@@ -1,5 +1,5 @@
 # Copyright (c) 2012 Quantitative & Financial
-# quantandfinancial.blogspot.com
+# www.quantandfinancial.com
 
 import math
 

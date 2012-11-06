@@ -1,5 +1,5 @@
 # Copyright (c) 2012 Quantitative & Financial, All rights reserved
-# quantandfinancial.blogspot.com
+# www.quantandfinancial.com
 
 # Given raw yields (yr), raw times to maturity (tr) and desired times to maturity (t),
 # this method will calculate and return the interpolated yield curve (t,y)

@@ -1,5 +1,5 @@
 # Copyright (c) 2012 Quantitative & Financial, All rights reserved
-# quantandfinancial.blogspot.com
+# www.quantandfinancial.com
 
 from datasources.bondscape import readfromfile
 from quant.tvm import TVM

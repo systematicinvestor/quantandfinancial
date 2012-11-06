@@ -1,5 +1,5 @@
 # Copyright (c) 2012 Quantitative & Financial, All rights reserved
-# quantandfinancial.blogspot.com
+# www.quantandfinancial.com
 
 from math import pow, floor, ceil, log
 from quant.optimization import newton
