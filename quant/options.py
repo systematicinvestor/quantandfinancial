@@ -14,7 +14,7 @@ class CRR:
 		# inputs
 		self.n = 32
 		self.side = None
-		self.type = None
+		self.style = None
 		self.price = None
 		self.strike = None
 		self.riskfree = None
@@ -30,7 +30,7 @@ class CRR:
 	def calculate(self):
 		# check inputs
 		if (self.side!=CRR.call and self.side!=CRR.put): raise ValueError("'side' - Option side must be either call or put")
-		if (self.type!=CRR.american and self.type!=CRR.european): raise ValueError("'type' - Option type must be either american or european")
+		if (self.style!=CRR.american and self.style!=CRR.european): raise ValueError("'style' - Option style must be either american or european")
 		if (self.price==None): raise ValueError("'price' - Instrument's price must be defined")
 		if (self.strike==None): raise ValueError("'strike' - Option's strike price must be defined")
 		if (self.riskfree==None): raise ValueError("'riskfree' - Riskfree rate must be defined")
@@ -67,8 +67,8 @@ class CRR:
 				pr = node_d[0] / d
 				# Option value at the node (depending on side)
 				ov = (node_d[1] * pd + node_u[1] * pu) / (1 + rf)	
-				if type==CRR.american: # American options can be exercised anytime
-					ov = max(ov, pr-self.strike if side==CALL else self.strike-pr)
+				if style==CRR.american: # American options can be exercised anytime
+					ov = max(ov, pr-self.strike if side==CRR.call else self.strike-pr)
 				levelNext.append((pr, ov))
 			level = levelNext
 			if j<=2: levels[j]=level # save level 0,1,2 of the tree

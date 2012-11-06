@@ -13,7 +13,7 @@ call, put, european, american = 100, 101, 102, 103
 #google.getquotesfromweb('IVV').savetofile('data/ivv.csv')
 
 prices = QuoteSeries.loadfromfile('IVV', 'data/ivv_2012_11_05.csv').getprices()
-prices = prices[:-30]	# We will use last 30 prices to calculate volatility
+prices = prices[-250:]	# We will use last 32 prices to calculate volatility (32 trading days ~ 46 calendar days)
 
 # Calculation of daily continuous (logaritmic) returns
 returns = []
@@ -27,7 +27,7 @@ volat = volat_d * 250**.5		# Annualized volatility
 
 # Calculation inputs
 side = call				# Option side
-type = european 		# Option type
+style = american 		# Option style
 price = prices[-1]		# Current instrument price (147.31, as of 2012/11/05)
 strike = 140			# Strike price
 riskfree = .0007		# Risk-free rate, Yield on 3m US Treasury Yields, as of 2012/11/05
@@ -45,7 +45,7 @@ pu = (1+rf-dy-d) / (u-d)		# Probability of up movement
 pd = 1 - pu						# Probability of down movement
 
 assert(side==call or side==put)
-assert(type==american or type==european)
+assert(style==american or style==european)
 
 # Generate terminal nodes of binomial tree
 level = []
@@ -70,8 +70,8 @@ for i in range(n-1, -1, -1): # [n-1 to 0]
 		pr = node_d[0] / d
 		# Option value at the node (depending on side)
 		ov = (node_d[1] * pd + node_u[1] * pu) / (1 + rf)	
-		if type==american: # American options can be exercised anytime
-			ov = max(ov, pr-strike if side==CALL else strike-pr)
+		if style==american: # American options can be exercised anytime
+			ov = max(ov, pr-strike if side==call else strike-pr)
 		levelNext.append((pr, ov))
 		print('Node Price %.3f, Option Value %.3f' %(pr, ov))
 	level = levelNext
