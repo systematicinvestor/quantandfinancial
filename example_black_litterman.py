@@ -5,13 +5,30 @@ from structures.quote import QuoteSeries
 import scipy.optimize
 import random
 
-# Function loads historical stock prices of nine major S&P companies and returns them together
-# with their market capitalizations, as of 2013-07-01
-def load_data_snp_stocks():
+####################################
+# Helper Functions
+####################################
+
+def load_data_net():
 	symbols = ['XOM', 'AAPL', 'MSFT', 'JNJ', 'GE', 'GOOG', 'CVX', 'PG', 'WFC']
 	cap = {'^GSPC':14.90e12, 'XOM':403.02e9, 'AAPL':392.90e9, 'MSFT':283.60e9, 'JNJ':243.17e9, 'GE':236.79e9, 'GOOG':292.72e9, 'CVX':231.03e9, 'PG':214.99e9, 'WFC':218.79e9}
 	n = len(symbols)
 	from datasources import yahoo
+	prices_out, caps_out = [], []	
+	for s in symbols:
+		print("Reading symbol %s" % s)
+		q = yahoo.getquotesfromweb(s)
+		prices = q.getprices()[-500:]		
+		prices_out.append(prices)
+		caps_out.append(cap[s])
+	return symbols, prices_out, caps_out
+	
+# Function loads historical stock prices of nine major S&P companies and returns them together
+# with their market capitalizations, as of 2013-07-01
+def load_data():
+	symbols = ['XOM', 'AAPL', 'MSFT', 'JNJ', 'GE', 'GOOG', 'CVX', 'PG', 'WFC']
+	cap = {'^GSPC':14.90e12, 'XOM':403.02e9, 'AAPL':392.90e9, 'MSFT':283.60e9, 'JNJ':243.17e9, 'GE':236.79e9, 'GOOG':292.72e9, 'CVX':231.03e9, 'PG':214.99e9, 'WFC':218.79e9}
+	n = len(symbols)
 	prices_out, caps_out = [], []	
 	for s in symbols:
 		print("Reading symbol %s" % s)
@@ -100,8 +117,9 @@ def solve_frontier(R, C, rf):
 		frontier_var.append(port_var(optimized.x, C))
 	return array(frontier_mean), array(frontier_var)
 	
-# Given risk-free rate, assets returns and covariances, this function calculates
-# weights of tangency portfolio with respect to sharpe ratio maximization
+# Given risk-free rate, assets returns and covariances, this 
+# function calculates weights of tangency portfolio with respect to 
+# sharpe ratio maximization
 def solve_weights(R, C, rf):
 	def fitness(W, R, C, rf):
 		mean, var = port_mean_var(W, R, C)	# calculate mean/variance of the portfolio
@@ -116,25 +134,30 @@ def solve_weights(R, C, rf):
 		raise BaseException(optimized.message)
 	return optimized.x	
 	
-def print_weights(names, W):
+def print_assets(names, W, R, C):
+	print("%-10s %6s %6s %6s %s" % ("Name", "Weight", "Return", "Dev", "   Correlations"))
 	for i in range(len(names)):
-		print("%-10s %4.1f %%" % (names[i], 100*W[i]))
+		print("%-10s %5.1f%% %5.1f%% %5.1f%%    " % (names[i], 100*W[i], 100*R[i], 100*C[i,i]**.5), end='')
+		for j in range(i+1):
+			corr = C[i,j] / (sqrt(C[i,i]) * (sqrt(C[j,j]))) # calculate correlation from covariance
+			print("%.3f " % corr, end='')
+		print()
 		
-iGraph = 0
-def optimize_and_display(title, names, R, C, rf):
+def optimize_and_display(title, names, R, C, rf, color='black'):
 	# optimize
 	W = solve_weights(R, C, rf)
 	mean, var = port_mean_var(W, R, C)							# calculate tangency portfolio
 	frontier_mean, frontier_var = solve_frontier(R, C, rf)		# calculate efficient frontier
 	# display
 	print(title)
-	global iGraph
-	sColor = ['red','green','blue','black'][iGraph]
-	print_weights(names, W)
-	scatter([C[i,i]**.5 for i in range(n)], R, marker='x', color=sColor), grid(True)	# draw assets 
-	scatter(var**.5, mean, marker='o', color=sColor), grid(True)						# draw tangency portfolio
-	plot(frontier_var**.5, frontier_mean, color=sColor), grid(True)						# draw efficient frontier
-	iGraph += 1
+	print_assets(names, W, R, C)
+	scatter([C[i,i]**.5 for i in range(n)], R, marker='x',color=color)  # draw assets   
+	for i in range(n): 											# draw labels
+		text(C[i,i]**.5, R[i], '  %s'%names[i], verticalalignment='center', color=color) 
+	scatter(var**.5, mean, marker='o', color=color)			# draw tangency portfolio
+	plot(frontier_var**.5, frontier_mean, color=color)		# draw efficient frontier
+	xlabel('$\sigma$'), ylabel('$r$')
+	grid(True)
 	
 # given the pairs of assets, prepare the views and link matrices. This function is created just for users' convenience
 def prepare_views_and_link_matrix(names, views):
@@ -150,10 +173,12 @@ def prepare_views_and_link_matrix(names, views):
 		P[i, nameToIndex[name2]] = -1 if views[i][1]=='>' else +1
 	return array(Q), P
 	
-# --- main ---	
+####################################
+# Main
+####################################
 	
-# Load names, prices, capitalizations from the data source	
-names, prices, caps = load_data_snp_stocks()
+# Load names, prices, capitalizations from the data source(yahoo finance)
+names, prices, caps = load_data()
 n = len(names)
 
 # Estimate assets's expected return and covariances
@@ -161,20 +186,22 @@ names, W, R, C = assets_meanvar(names, prices, caps)
 rf = .015  	# Risk-free rate
 
 print("Historical Weights")
-print_weights(names, W)
+print_assets(names, W, R, C)
 
 # Calculate portfolio historical return and variance
 mean, var = port_mean_var(W, R, C)
 
 # Mean-Variance Optimization (based on historical returns)
-optimize_and_display('Optimization based on Historical returns', names, R, C, rf)
+optimize_and_display('Optimization based on Historical returns', names, R, C, rf, color='black')
+
+show()
 
 # Black-litterman reverse optimization
 lmb = (mean - rf) / var				# Calculate risk aversion
 Pie = dot(dot(lmb, C), W)			# Calculate equilibrium excess returns
 
 # Mean-variance Optimization (based on equilibrium returns)
-optimize_and_display('Optimization based on Equilibrium returns', names, Pie+rf, C, rf)
+optimize_and_display('Optimization based on Equilibrium returns', names, Pie+rf, C, rf, color='green')
 
 # Determine views to the equilibrium returns and prepare views (Q) and link (P) matrices
 views = [
@@ -200,6 +227,6 @@ sub_d = dot(dot(transpose(P), inv(omega)), Q)
 Pie = dot(inv(sub_a + sub_b), (sub_c + sub_d))
 
 # Mean-variance Optimization (based on equilibrium returns)
-optimize_and_display('Optimization based on Equilibrium returns with adjusted views', names, Pie+rf, C, rf)
+optimize_and_display('Optimization based on Equilibrium returns with adjusted views', names, Pie+rf, C, rf, color='blue')
 
 show()   
