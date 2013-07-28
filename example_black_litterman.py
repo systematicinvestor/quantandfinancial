@@ -101,9 +101,10 @@ def solve_frontier(R, C, rf):
 		# For given level of return r, find weights which minimizes
 		# portfolio variance.
 		mean, var = port_mean_var(W, R, C)
-		penalty = 100*abs(mean-r)		# Big penalty for not meeting stated portfolio return effectively serves as optimization constraint
+		# Big penalty for not meeting stated portfolio return effectively serves as optimization constraint
+		penalty = 50*abs(mean-r)
 		return var + penalty
-	frontier_mean, frontier_var = [], []
+	frontier_mean, frontier_var, frontier_weights = [], [], []
 	n = len(R)	# Number of assets in the portfolio
 	for r in linspace(min(R), max(R), num=20): # Iterate through the range of returns on Y axis
 		W = ones([n])/n		# start optimization with equal weights
@@ -112,10 +113,11 @@ def solve_frontier(R, C, rf):
 		optimized = scipy.optimize.minimize(fitness, W, (R, C, r), method='SLSQP', constraints=c_, bounds=b_)	
 		if not optimized.success: 
 			raise BaseException(optimized.message)
-		# add point to the efficient frontier [x,y] = [optimized.x, r]
-		frontier_mean.append(r)				
-		frontier_var.append(port_var(optimized.x, C))
-	return array(frontier_mean), array(frontier_var)
+		# add point to the min-var frontier [x,y] = [optimized.x, r]
+		frontier_mean.append(r)							# return
+		frontier_var.append(port_var(optimized.x, C))	# min-variance based on optimized weights
+		frontier_weights.append(optimized.x)
+	return array(frontier_mean), array(frontier_var), frontier_weights
 	
 # Given risk-free rate, assets returns and covariances, this 
 # function calculates weights of tangency portfolio with respect to 
@@ -146,18 +148,29 @@ def print_assets(names, W, R, C):
 def optimize_and_display(title, names, R, C, rf, color='black'):
 	# optimize
 	W = solve_weights(R, C, rf)
-	mean, var = port_mean_var(W, R, C)							# calculate tangency portfolio
-	frontier_mean, frontier_var = solve_frontier(R, C, rf)		# calculate efficient frontier
-	# display
+	mean, var = port_mean_var(W, R, C)						# calculate tangency portfolio
+	f_mean, f_var, f_weights = solve_frontier(R, C, rf)		# calculate min-var frontier
+	
+	# display min-var frontier
 	print(title)
 	print_assets(names, W, R, C)
+	n = len(names)
 	scatter([C[i,i]**.5 for i in range(n)], R, marker='x',color=color)  # draw assets   
-	for i in range(n): 											# draw labels
+	for i in range(n): 										# draw labels
 		text(C[i,i]**.5, R[i], '  %s'%names[i], verticalalignment='center', color=color) 
 	scatter(var**.5, mean, marker='o', color=color)			# draw tangency portfolio
-	plot(frontier_var**.5, frontier_mean, color=color)		# draw efficient frontier
+	plot(f_var**.5, f_mean, color=color)					# draw min-var frontier
 	xlabel('$\sigma$'), ylabel('$r$')
 	grid(True)
+	show() 
+	
+	# Display weights
+	#m = empty([n, len(f_weights)])
+	#for i in range(n):
+	#	for j in range(m.shape[1]):
+	#		m[i,j] = f_weights[j][i]
+	#stackplot(f_mean, m)
+	#show()
 	
 # given the pairs of assets, prepare the views and link matrices. This function is created just for users' convenience
 def prepare_views_and_link_matrix(names, views):
@@ -194,8 +207,6 @@ mean, var = port_mean_var(W, R, C)
 # Mean-Variance Optimization (based on historical returns)
 optimize_and_display('Optimization based on Historical returns', names, R, C, rf, color='black')
 
-show()
-
 # Black-litterman reverse optimization
 lmb = (mean - rf) / var				# Calculate risk aversion
 Pie = dot(dot(lmb, C), W)			# Calculate equilibrium excess returns
@@ -228,5 +239,3 @@ Pie = dot(inv(sub_a + sub_b), (sub_c + sub_d))
 
 # Mean-variance Optimization (based on equilibrium returns)
 optimize_and_display('Optimization based on Equilibrium returns with adjusted views', names, Pie+rf, C, rf, color='blue')
-
-show()   
