@@ -162,7 +162,7 @@ def optimize_and_display(title, names, R, C, rf, color='black'):
 	plot(f_var**.5, f_mean, color=color)					# draw min-var frontier
 	xlabel('$\sigma$'), ylabel('$r$')
 	grid(True)
-	show() 
+#	show() 
 	
 	# Display weights
 	#m = empty([n, len(f_weights)])
@@ -205,14 +205,16 @@ print_assets(names, W, R, C)
 mean, var = port_mean_var(W, R, C)
 
 # Mean-Variance Optimization (based on historical returns)
-optimize_and_display('Optimization based on Historical returns', names, R, C, rf, color='black')
+optimize_and_display('Optimization based on Historical returns', names, R, C, rf, color='red')
+show()
 
 # Black-litterman reverse optimization
-lmb = (mean - rf) / var				# Calculate risk aversion
+lmb = (mean - rf) / var				# Calculate return/risk trade-off
 Pie = dot(dot(lmb, C), W)			# Calculate equilibrium excess returns
 
 # Mean-variance Optimization (based on equilibrium returns)
 optimize_and_display('Optimization based on Equilibrium returns', names, Pie+rf, C, rf, color='green')
+show()
 
 # Determine views to the equilibrium returns and prepare views (Q) and link (P) matrices
 views = [
@@ -239,3 +241,4 @@ Pie = dot(inv(sub_a + sub_b), (sub_c + sub_d))
 
 # Mean-variance Optimization (based on equilibrium returns)
 optimize_and_display('Optimization based on Equilibrium returns with adjusted views', names, Pie+rf, C, rf, color='blue')
+show()
