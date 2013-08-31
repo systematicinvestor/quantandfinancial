@@ -79,7 +79,7 @@ def assets_meanvar(names, prices, caps):
 #	R		assets returns
 #	mean	portfolio historical return
 #	var		portfolio historical variance
-#	Pie		portfolio equilibrium excess returns
+#	Pi		portfolio equilibrium excess returns
 # 	tau 	scaling factor for Black-litterman
 	
 # Calculates portfolio mean return
@@ -210,10 +210,10 @@ show()
 
 # Black-litterman reverse optimization
 lmb = (mean - rf) / var				# Calculate return/risk trade-off
-Pie = dot(dot(lmb, C), W)			# Calculate equilibrium excess returns
+Pi = dot(dot(lmb, C), W)			# Calculate equilibrium excess returns
 
 # Mean-variance Optimization (based on equilibrium returns)
-optimize_and_display('Optimization based on Equilibrium returns', names, Pie+rf, C, rf, color='green')
+optimize_and_display('Optimization based on Equilibrium returns', names, Pi+rf, C, rf, color='green')
 show()
 
 # Determine views to the equilibrium returns and prepare views (Q) and link (P) matrices
@@ -235,10 +235,10 @@ omega = dot(dot(dot(tau, P), C), transpose(P)) # 0.025 * P * C * transpose(P)
 # Calculate equilibrium excess returns with views incorporated
 sub_a = inv(dot(tau, C))
 sub_b = dot(dot(transpose(P), inv(omega)), P)
-sub_c = dot(inv(dot(tau, C)), Pie)
+sub_c = dot(inv(dot(tau, C)), Pi)
 sub_d = dot(dot(transpose(P), inv(omega)), Q)
-Pie = dot(inv(sub_a + sub_b), (sub_c + sub_d))
+Pi = dot(inv(sub_a + sub_b), (sub_c + sub_d))
 
 # Mean-variance Optimization (based on equilibrium returns)
-optimize_and_display('Optimization based on Equilibrium returns with adjusted views', names, Pie+rf, C, rf, color='blue')
+optimize_and_display('Optimization based on Equilibrium returns with adjusted views', names, Pi+rf, C, rf, color='blue')
 show()
