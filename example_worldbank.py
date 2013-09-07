@@ -15,7 +15,7 @@ def parse_argv(argv):
 		exit(1)
 	outputFile = argv[1]
 	indicators = argv[2:]
-	return outputFile, indicabtors
+	return outputFile, indicators
 	
 outputFile, indicators = parse_argv(sys.argv)	
 	
