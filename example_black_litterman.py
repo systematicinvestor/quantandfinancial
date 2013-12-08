@@ -176,7 +176,7 @@ def optimize_and_display(title, names, R, C, rf, color='black'):
 def prepare_views_and_link_matrix(names, views):
 	r, c = len(views), len(names)
 	Q = [views[i][3] for i in range(r)]	# view matrix
-	P = zeros([r, c])
+	P = zeros([r, c])					# link matrix
 	nameToIndex = dict()
 	for i, n in enumerate(names):
 		nameToIndex[n] = i
